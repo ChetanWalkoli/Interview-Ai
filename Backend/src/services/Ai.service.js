@@ -33,21 +33,27 @@ const interviewReportSchema = z.object({
 });
 
 // Simple test function to verify Gemini connectivity
-async function invokeGeminiAi() {
+async function invokeGeminiAi(prompt = "Say hello") {
     try {
         const response = await ai.models.generateContent({
             model: "gemini-3.6-flash",
-            contents: "Say hello",
+            contents: prompt,
             config: { responseMimeType: "text/plain" }
         });
         console.log("Gemini response:", response.text);
+        return response.text;
     } catch (err) {
         console.error("Error invoking Gemini:", err.message);
+        return null;
     }
 }
 
 // Safe defaults so calling with no arguments won't crash
 async function generatesIntrviewReport({ resume = "", selfDiscription = "", jobDiscription = "" } = {}) {
+    if (!resume && !selfDiscription && !jobDiscription) {
+        return null;
+    }
+    
     const prompt = `Genrate an interview report for a candidate with the following details:
             Resume: ${resume}
             Self Description: ${selfDiscription}
@@ -62,9 +68,13 @@ async function generatesIntrviewReport({ resume = "", selfDiscription = "", jobD
                 responseJsonSchema: zodToJsonSchema(interviewReportSchema, "interviewReportSchema")
             }
         });
-        console.log(JSON.parse(response.text));
+        
+        const data = JSON.parse(response.text);
+        console.log("Interview Report Generated successfully.");
+        return data;
     } catch (err) {
         console.error("Error generating interview report:", err.message);
+        return null;
     }
 }
 
