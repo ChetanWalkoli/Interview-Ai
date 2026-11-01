@@ -1,38 +1,160 @@
 const { GoogleGenAI } = require("@google/genai");
-const { z } = require("zod");
-const { zodToJsonSchema } = require("zod-to-json-schema");
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
 });
 
-const interviewReportSchema = z.object({
-    technicalQuestions: z.array(z.object({
-        questions: z.string().describe("The technical question can be ask in interview"),
-        intentation: z.string().describe("The intentation of interviewer behind asking this question"),
-        answer: z.string().describe("How to answer this question, what points to cover , what approch to take etc.")
-    })).describe("The technical questions are the questions which are asked to know about the candidate's technical skills and knowledge."),
+const interviewReportSchema = {
+    type: "object",
+    properties: {
+        matchScore: {
+            type: "number",
+            description: "Overall candidate match score percentage between 0 and 100 based on job description vs resume/skills"
+        },
+        technicalQuestions: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    questions: {
+                        type: "string",
+                        description: "The technical question that can be asked in the interview"
+                    },
+                    intentation: {
+                        type: "string",
+                        description: "The intention of the interviewer behind asking this question"
+                    },
+                    answer: {
+                        type: "string",
+                        description: "How to answer this question, key points to cover, and recommended approach"
+                    }
+                },
+                required: ["questions", "intentation", "answer"]
+            },
+            description: "Technical questions tailored to the candidate's skills and target job."
+        },
+        behavioralQuestions: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    questions: {
+                        type: "string",
+                        description: "Behavioral question to evaluate culture fit and communication"
+                    },
+                    intentation: {
+                        type: "string",
+                        description: "The intention of interviewer behind asking this question"
+                    },
+                    answer: {
+                        type: "string",
+                        description: "STAR method guidance, key talking points, and response tips"
+                    }
+                },
+                required: ["questions", "intentation", "answer"]
+            },
+            description: "Behavioral and situational questions."
+        },
+        skillGap: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    skill: {
+                        type: "string",
+                        description: "The skill or technology area where the candidate has a gap"
+                    },
+                    severity: {
+                        type: "string",
+                        description: "Severity of the gap: Low, Medium, or High"
+                    }
+                },
+                required: ["skill", "severity"]
+            },
+            description: "Identified gaps between requirements and candidate profile."
+        },
+        preparationPlan: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    day: {
+                        type: "number",
+                        description: "Day number of the prep plan (e.g. 1 to 7)"
+                    },
+                    task: {
+                        type: "string",
+                        description: "Specific learning or practice task for the day"
+                    },
+                    resources: {
+                        type: "string",
+                        description: "Suggested resources, documentation, or practice materials"
+                    },
+                    focus: {
+                        type: "string",
+                        description: "Key topic or focal area for the day"
+                    }
+                },
+                required: ["day", "task", "resources", "focus"]
+            },
+            description: "Structured day-by-day interview preparation roadmap."
+        }
+    },
+    required: ["matchScore", "technicalQuestions", "behavioralQuestions", "skillGap", "preparationPlan"]
+};
 
-    behavioralQuestions: z.array(z.object({
-        questions: z.string().describe("The behavioral question can be ask in interview"),
-        intentation: z.string().describe("The intentation of interviewer behind asking this question"),
-        answer: z.string().describe("How to answer this question, what points to cover , what approch to take etc.")
-    })).describe("The behavioral questions are the questions which are asked to know about the candidate's behavior, attitude, and personality."),
+const interviewEvaluationSchema = {
+    type: "object",
+    properties: {
+        overallScore: {
+            type: "number",
+            description: "Overall interview performance score from 0 to 100 based on quality and completeness of answers."
+        },
+        questionEvaluations: {
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    question: {
+                        type: "string",
+                        description: "The interview question evaluated"
+                    },
+                    answer: {
+                        type: "string",
+                        description: "The candidate's provided answer"
+                    },
+                    score: {
+                        type: "number",
+                        description: "Score out of 10 for this answer"
+                    },
+                    feedback: {
+                        type: "string",
+                        description: "Specific strengths and improvement points for this answer"
+                    }
+                },
+                required: ["question", "answer", "score", "feedback"]
+            },
+            description: "Detailed evaluation per question"
+        },
+        strengths: {
+            type: "array",
+            items: { type: "string" },
+            description: "Top 3-5 demonstrated candidate strengths"
+        },
+        areasForImprovement: {
+            type: "array",
+            items: { type: "string" },
+            description: "Top 3-5 constructive areas for candidate to improve"
+        },
+        recommendations: {
+            type: "array",
+            items: { type: "string" },
+            description: "Actionable advice for upcoming real interviews"
+        }
+    },
+    required: ["overallScore", "questionEvaluations", "strengths", "areasForImprovement", "recommendations"]
+};
 
-    skillGap: z.array(z.object({
-        skill: z.string().describe("The skill which the candidate is lacking and needs to improve"),
-        severity: z.string().describe("The severity of the skill gap, how important is this skill for the job role and how much impact it will have on the candidate's performance"),
-    })).describe("The skill gap is the difference between the skills that the candidate has and the skills that are required for the job role. It helps to identify the areas where the candidate needs to improve and focus on."),
-
-    preparationPlan: z.array(z.object({
-        day: z.number().describe("The day number of the preparation plan, it helps to track the progress of the candidate's preparation"),
-        task: z.string().describe("The task to be completed on this day"),
-        resources: z.string().describe("The resources required for the task"),
-        focus: z.string().describe("The area of focus for the task")
-    })).describe("The preparation plan is a structured approach to help the candidate prepare for the interview.")
-});
-
-// Simple test function to verify Gemini connectivity
 async function invokeGeminiAi(prompt = "Say hello") {
     try {
         const response = await ai.models.generateContent({
@@ -48,34 +170,105 @@ async function invokeGeminiAi(prompt = "Say hello") {
     }
 }
 
-// Safe defaults so calling with no arguments won't crash
-async function generatesIntrviewReport({ resume = "", selfDiscription = "", jobDiscription = "" } = {}) {
-    if (!resume && !selfDiscription && !jobDiscription) {
+async function generatesIntrviewReport({ resume = "", selfDescription = "", selfDiscription = "", jobDescription = "", jobDiscription = "" } = {}) {
+    const finalSelfDesc = selfDescription || selfDiscription || "";
+    const finalJobDesc = jobDescription || jobDiscription || "";
+
+    if (!resume && !finalSelfDesc && !finalJobDesc) {
         return null;
     }
-    
-    const prompt = `Genrate an interview report for a candidate with the following details:
-            Resume: ${resume}
-            Self Description: ${selfDiscription}
-            Job Description: ${jobDiscription}
+
+    const prompt = `You are an expert technical interviewer and career coach.
+Generate a comprehensive interview preparation report for a candidate with the following background:
+
+Job Description:
+${finalJobDesc || "Software Engineer role"}
+
+Candidate Resume / Background:
+${resume || "Not provided"}
+
+Candidate Self Description / Experience Summary:
+${finalSelfDesc || "Not provided"}
+
+Produce detailed technical questions, behavioral questions, skill gap analysis, day-by-day preparation plan, and an estimated matchScore (0-100).
 `;
+
     try {
         const response = await ai.models.generateContent({
             model: "gemini-3.6-flash",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
-                responseJsonSchema: zodToJsonSchema(interviewReportSchema, "interviewReportSchema")
+                responseJsonSchema: interviewReportSchema
             }
         });
-        
+
         const data = JSON.parse(response.text);
-        console.log("Interview Report Generated successfully.");
         return data;
     } catch (err) {
         console.error("Error generating interview report:", err.message);
-        return null;
+        throw err;
     }
 }
 
-module.exports = { invokeGeminiAi, generatesIntrviewReport };
+/**
+ * Evaluates candidate responses to interview questions
+ */
+async function evaluateInterviewAnswers({ questions = [], answers = {}, jobDescription = "" }) {
+    const qaPairs = questions.map((q, idx) => {
+        const candidateAnswer = typeof answers[idx] === "string" ? answers[idx] : (answers[q.id] || "No answer provided");
+        return `Question ${idx + 1} (${q.category || "General"}): ${q.question || q.questions}
+Candidate Answer: ${candidateAnswer || "Candidate left this question blank."}
+`;
+    }).join("\n---\n");
+
+    const prompt = `You are an executive interviewer and hiring manager assessing an interview candidate for the following role:
+Role / Job Description: ${jobDescription || "Software Engineer"}
+
+Here are the questions asked and the candidate's answers:
+${qaPairs}
+
+Provide a fair, rigorous evaluation:
+1. Score each answer from 0 to 10 with actionable feedback. Blank answers receive 0.
+2. Determine an overall score from 0 to 100.
+3. List candidate strengths, areas for improvement, and tailored recommendations.
+`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-3.6-flash",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseJsonSchema: interviewEvaluationSchema
+            }
+        });
+
+        return JSON.parse(response.text);
+    } catch (err) {
+        console.error("Error evaluating answers with Gemini:", err.message);
+        // Fallback calculation in case of AI rate limit
+        const answeredCount = Object.values(answers).filter(a => typeof a === "string" && a.trim().length > 0).length;
+        const total = questions.length || 1;
+        const fallbackScore = Math.round((answeredCount / total) * 80);
+
+        return {
+            overallScore: fallbackScore,
+            questionEvaluations: questions.map((q, idx) => ({
+                question: q.question || q.questions,
+                answer: answers[idx] || "No answer provided",
+                score: answers[idx] ? 7 : 0,
+                feedback: answers[idx] ? "Answer provided. Review key trade-offs and clarify system architecture." : "Question was not answered."
+            })),
+            strengths: ["Completed mock interview session", "Demonstrated problem-solving structure"],
+            areasForImprovement: ["Provide deeper real-world examples", "Use STAR method for behavioral answers"],
+            recommendations: ["Review day-by-day preparation plan", "Practice system design fundamentals"]
+        };
+    }
+}
+
+module.exports = {
+    invokeGeminiAi,
+    generatesIntrviewReport,
+    evaluateInterviewAnswers
+};
