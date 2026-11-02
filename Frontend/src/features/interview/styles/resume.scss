@@ -2,126 +2,181 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: #101010;
+    background-color: #0d0d10;
     color: #f3f4f6;
 
     .resume-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 1.25rem 2.5rem;
-        border-bottom: 1px solid #222222;
-        background-color: #141414;
+        padding: 1.1rem 2.2rem;
+        border-bottom: 1px solid #202025;
+        background-color: rgba(13, 13, 16, 0.96);
+        position: sticky;
+        top: 0;
+        z-index: 50;
 
         .brand-link {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             text-decoration: none;
             color: inherit;
 
             .badge {
-                background-color: #e1034d;
+                background-color: #e11d48;
                 color: #ffffff;
                 font-weight: 700;
-                font-size: 0.8rem;
-                padding: 0.15rem 0.5rem;
+                font-size: 0.75rem;
+                padding: 0.18rem 0.5rem;
                 border-radius: 0.35rem;
+                letter-spacing: 0.04em;
             }
 
             .title {
                 font-size: 1.15rem;
                 font-weight: 700;
+                letter-spacing: -0.02em;
+                color: #f9fafb;
+            }
+
+            .session-divider {
+                color: #4b5563;
+                font-weight: 400;
+            }
+
+            .session-sub {
+                font-size: 0.88rem;
+                color: #9ca3af;
+                font-weight: 500;
             }
         }
 
         .header-actions {
             display: flex;
-            gap: 1rem;
+            gap: 0.85rem;
+            align-items: center;
 
             .home-btn {
-                background: transparent;
-                border: 1px solid #333333;
+                background-color: #15151a;
+                border: 1px solid #262630;
                 color: #9ca3af;
-                padding: 0.45rem 1rem;
-                border-radius: 0.5rem;
-                font-size: 0.9rem;
+                padding: 0.42rem 0.95rem;
+                border-radius: 0.45rem;
+                font-size: 0.85rem;
+                font-weight: 500;
                 cursor: pointer;
-                transition: all 0.2s;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                transition: all 0.15s ease;
 
                 &:hover {
                     color: #ffffff;
-                    border-color: #555555;
-                    background-color: #1f1f1f;
+                    border-color: #3b3b48;
+                    background-color: #1e1e26;
                 }
+            }
+
+            .primary-button {
+                padding: 0.42rem 1rem;
+                font-size: 0.85rem;
+                border-radius: 0.45rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
             }
         }
     }
 
     .resume-container {
         flex: 1;
-        max-width: 880px;
+        max-width: 840px;
         width: 100%;
         margin: 0 auto;
         padding: 2.5rem 1.5rem 5rem;
         display: flex;
         flex-direction: column;
-        gap: 2rem;
+        gap: 1.75rem;
 
         .page-intro {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-end;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.25rem;
+            border-bottom: 1px solid #1c1c22;
+            padding-bottom: 1.5rem;
 
             h1 {
-                font-size: 1.85rem;
-                font-weight: 800;
-                color: #ffffff;
+                font-size: 1.65rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                color: #f9fafb;
+                margin-bottom: 0.35rem;
             }
 
             p {
-                color: #9ca3af;
-                font-size: 0.95rem;
+                color: #888894;
+                font-size: 0.9rem;
             }
 
             .prefill-btn {
-                background-color: #1e1e1e;
-                border: 1px solid #333333;
+                background-color: #16161c;
+                border: 1px solid #272733;
                 color: #d1d5db;
-                padding: 0.5rem 1rem;
-                border-radius: 0.5rem;
-                font-size: 0.85rem;
-                font-weight: 600;
+                padding: 0.5rem 0.95rem;
+                border-radius: 0.45rem;
+                font-size: 0.82rem;
+                font-weight: 500;
                 cursor: pointer;
-                transition: all 0.2s;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                transition: all 0.15s ease;
 
                 &:hover {
-                    background-color: #2a2a2a;
-                    border-color: #555555;
+                    background-color: #202028;
+                    border-color: #3b3b4a;
                     color: #ffffff;
+                }
+
+                .sparkle-icon {
+                    color: #f43f5e;
                 }
             }
         }
 
         /* Notifications */
         .notification-card {
-            border-radius: 0.75rem;
-            padding: 1.25rem 1.5rem;
-            font-size: 0.92rem;
-            line-height: 1.4;
+            border-radius: 0.6rem;
+            padding: 1rem 1.25rem;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
 
             &.success {
-                background-color: #062b1b;
-                border: 1px solid #059669;
+                background-color: #0e2017;
+                border: 1px solid #1b4d35;
                 color: #6ee7b7;
+
+                .notif-icon {
+                    color: #34d399;
+                    flex-shrink: 0;
+                }
             }
 
             &.error {
-                background-color: #2b1115;
-                border: 1px solid #dc2626;
+                background-color: #1e1316;
+                border: 1px solid #4d1c24;
                 color: #fca5a5;
+
+                .notif-icon {
+                    color: #f87171;
+                    flex-shrink: 0;
+                }
             }
         }
 
@@ -129,114 +184,138 @@
         .resume-form {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.5rem;
 
             .form-section {
-                background-color: #151515;
-                border: 1px solid #242424;
-                border-radius: 1rem;
-                padding: 2rem;
+                background-color: #131317;
+                border: 1px solid #202026;
+                border-radius: 0.75rem;
+                padding: 1.75rem;
 
                 .section-header {
-                    font-size: 1.2rem;
-                    font-weight: 700;
+                    font-size: 1.05rem;
+                    font-weight: 600;
                     margin-bottom: 1.25rem;
-                    color: #ffffff;
-                    border-bottom: 1px solid #222222;
-                    padding-bottom: 0.75rem;
+                    color: #f9fafb;
+                    border-bottom: 1px solid #1c1c22;
+                    padding-bottom: 0.65rem;
+                    letter-spacing: -0.01em;
                 }
 
                 .grid-2 {
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-                    gap: 1.25rem;
+                    gap: 1rem;
                 }
 
                 .form-group {
                     display: flex;
                     flex-direction: column;
                     gap: 0.45rem;
-                    margin-bottom: 1rem;
+                    margin-bottom: 0.9rem;
 
                     label {
-                        font-size: 0.88rem;
-                        font-weight: 600;
+                        font-size: 0.85rem;
+                        font-weight: 500;
                         color: #d1d5db;
 
                         .req {
-                            color: #e1034d;
+                            color: #f43f5e;
                         }
                     }
 
                     input[type="text"],
                     input[type="email"],
                     textarea {
-                        background-color: #101010;
-                        border: 1px solid #2c2c2c;
-                        border-radius: 0.6rem;
-                        padding: 0.75rem 1rem;
+                        background-color: #0f0f13;
+                        border: 1px solid #25252e;
+                        border-radius: 0.5rem;
+                        padding: 0.75rem 0.95rem;
                         color: #f3f4f6;
-                        font-size: 0.92rem;
+                        font-size: 0.9rem;
                         font-family: inherit;
-                        transition: border-color 0.2s;
+                        line-height: 1.5;
+                        transition: border-color 0.15s ease;
+
+                        &::placeholder {
+                            color: #555562;
+                        }
 
                         &:focus {
                             outline: none;
-                            border-color: #e1034d;
+                            border-color: #f43f5e;
                         }
+                    }
+
+                    textarea {
+                        resize: vertical;
                     }
                 }
 
                 .item-card {
-                    background-color: #111111;
-                    border: 1px solid #242424;
-                    border-radius: 0.75rem;
-                    padding: 1.25rem;
-                    margin-bottom: 1rem;
+                    background-color: #0f0f13;
+                    border: 1px solid #202028;
+                    border-radius: 0.55rem;
+                    padding: 1.15rem;
+                    margin-bottom: 0.9rem;
                     display: flex;
                     flex-direction: column;
-                    gap: 0.85rem;
+                    gap: 0.75rem;
 
                     .item-header {
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
 
-                        span {
-                            font-size: 0.88rem;
-                            font-weight: 700;
-                            color: #e1034d;
+                        .item-index {
+                            font-size: 0.78rem;
+                            font-weight: 600;
+                            color: #f43f5e;
+                            font-family: monospace;
                         }
 
                         .remove-btn {
                             background: transparent;
                             border: none;
-                            color: #ef4444;
+                            color: #9ca3af;
                             cursor: pointer;
-                            font-size: 0.82rem;
+                            font-size: 0.78rem;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 0.3rem;
+                            transition: color 0.15s ease;
 
                             &:hover {
-                                text-decoration: underline;
+                                color: #f87171;
                             }
                         }
                     }
                 }
 
                 .add-item-btn {
-                    background-color: #1a1a1a;
-                    border: 1px dashed #333333;
+                    background-color: #15151c;
+                    border: 1px dashed #2b2b38;
                     color: #d1d5db;
-                    padding: 0.65rem 1.25rem;
-                    border-radius: 0.5rem;
-                    font-size: 0.88rem;
-                    font-weight: 600;
+                    padding: 0.6rem 1rem;
+                    border-radius: 0.45rem;
+                    font-size: 0.82rem;
+                    font-weight: 500;
                     cursor: pointer;
                     width: 100%;
-                    transition: all 0.2s;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.35rem;
+                    transition: all 0.15s ease;
 
                     &:hover {
-                        border-color: #e1034d;
+                        border-color: #3f3f50;
                         color: #ffffff;
+                        background-color: #1a1a24;
+                    }
+
+                    .plus-icon {
+                        color: #f43f5e;
                     }
                 }
             }
@@ -244,27 +323,31 @@
             .submit-bar {
                 display: flex;
                 flex-direction: column;
-                gap: 0.75rem;
+                gap: 0.65rem;
                 align-items: center;
+                margin-top: 0.5rem;
 
                 .download-btn {
                     width: 100%;
-                    padding: 1.1rem;
-                    font-size: 1.1rem;
-                    display: flex;
+                    padding: 0.9rem;
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    border-radius: 0.55rem;
+                    display: inline-flex;
                     justify-content: center;
                     align-items: center;
-                    gap: 0.75rem;
+                    gap: 0.5rem;
 
                     &:disabled {
-                        opacity: 0.6;
+                        opacity: 0.5;
                         cursor: not-allowed;
                     }
                 }
 
                 .hint-text {
-                    font-size: 0.85rem;
-                    color: #9ca3af;
+                    font-size: 0.8rem;
+                    color: #71717a;
+                    text-align: center;
                 }
             }
         }
@@ -273,10 +356,16 @@
     @media (max-width: 768px) {
         .resume-header {
             padding: 1rem;
+
+            .brand-link {
+                .session-sub {
+                    display: none;
+                }
+            }
         }
 
         .resume-container {
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 1rem 3rem;
         }
 
         .form-section {
@@ -284,4 +373,3 @@
         }
     }
 }
-

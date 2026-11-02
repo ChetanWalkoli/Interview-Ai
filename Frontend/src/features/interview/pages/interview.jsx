@@ -4,6 +4,71 @@ import { useInterview } from "../hooks/use.interview";
 import { useReports } from "../hooks/use.reports";
 import "../styles/interview.scss";
 
+// Reusable zero-dependency stroke-based Lucide-inspired SVG icon components
+const IconWrapper = ({ children, size = 18, className = "" }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        aria-hidden="true"
+        focusable="false"
+    >
+        {children}
+    </svg>
+);
+
+const ArrowLeftIcon = ({ size = 16, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="m12 19-7-7 7-7" />
+        <path d="M19 12H5" />
+    </IconWrapper>
+);
+
+const ArrowRightIcon = ({ size = 15, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+    </IconWrapper>
+);
+
+const FileUpIcon = ({ size = 22, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+        <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+        <path d="M12 12v6" />
+        <path d="m15 15-3-3-3 3" />
+    </IconWrapper>
+);
+
+const CheckCircleIcon = ({ size = 18, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <path d="m9 11 3 3L22 4" />
+    </IconWrapper>
+);
+
+const HelpCircleIcon = ({ size = 15, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <path d="M12 17h.01" />
+    </IconWrapper>
+);
+
+const AlertCircleIcon = ({ size = 18, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" x2="12" y1="8" y2="12" />
+        <line x1="12" x2="12.01" y1="16" y2="16" />
+    </IconWrapper>
+);
+
 const Interview = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -96,12 +161,13 @@ const Interview = () => {
             {/* Top Navigation */}
             <header className="interview-header">
                 <Link to="/" className="brand-link">
-                    <span className="badge">AI</span>
-                    <span className="title">Interview Session</span>
+                    <span className="title">interview-ai</span>
+                    <span className="session-divider">/</span>
+                    <span className="session-sub">Practice Session</span>
                 </Link>
                 <div className="header-actions">
                     <button className="exit-btn" onClick={() => navigate("/")}>
-                        Exit Interview
+                        <ArrowLeftIcon size={14} className="exit-icon" /> Exit Session
                     </button>
                 </div>
             </header>
@@ -110,7 +176,10 @@ const Interview = () => {
                 {/* 1. Error Message Banner */}
                 {error && (
                     <div className="error-card">
-                        <div className="error-title">Interview Notice</div>
+                        <div className="error-header">
+                            <AlertCircleIcon size={18} className="error-icon" />
+                            <div className="error-title">Interview Session Notice</div>
+                        </div>
                         <p className="error-message">{error}</p>
                         <button className="retry-btn" onClick={handleStartInterview}>
                             Retry
@@ -122,9 +191,9 @@ const Interview = () => {
                 {loading && (
                     <div className="loading-card">
                         <div className="spinner"></div>
-                        <h3>Analyzing Profile & Formulating Questions...</h3>
+                        <h3>Formulating Interview Scenarios...</h3>
                         <p>
-                            Gemini AI is examining your background against the target job description to build a custom interview curriculum.
+                            Analyzing role requirements and tailoring technical and behavioral questions to your background.
                         </p>
                     </div>
                 )}
@@ -133,9 +202,9 @@ const Interview = () => {
                 {evaluating && (
                     <div className="loading-card">
                         <div className="spinner"></div>
-                        <h3>Evaluating Your Interview Responses...</h3>
+                        <h3>Evaluating Responses...</h3>
                         <p>
-                            Gemini AI is reviewing your answers, calculating question scores, identifying key strengths, and generating targeted feedback.
+                            Reviewing answers against domain benchmarks, calculating question scores, and preparing actionable feedback.
                         </p>
                     </div>
                 )}
@@ -144,16 +213,16 @@ const Interview = () => {
                 {!loading && !evaluating && totalQuestions === 0 && !isCompleted && (
                     <div className="setup-card">
                         <div className="setup-header">
-                            <h2>Configure Your Mock Interview</h2>
-                            <p>Provide your target role details and resume to tailor your interview questions.</p>
+                            <h2>Session Configuration</h2>
+                            <p>Provide target role requirements and your background to calibrate practice questions.</p>
                         </div>
 
                         <form onSubmit={handleStartInterview}>
                             <div className="form-group">
-                                <label>Target Job Description / Role *</label>
+                                <label>Target Job Description / Role Requirements <span className="req">*</span></label>
                                 <textarea
                                     rows="4"
-                                    placeholder="e.g. Senior Full-Stack Engineer requiring Node.js, React, MongoDB, System Design..."
+                                    placeholder="e.g. Senior Full-Stack Engineer requiring Node.js, React, MongoDB, System Design, and REST APIs..."
                                     value={jobDescription}
                                     onChange={(e) => setJobDescription(e.target.value)}
                                     required
@@ -161,26 +230,30 @@ const Interview = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Self Description / Experience Summary (Optional)</label>
+                                <label>Candidate Background / Experience Summary (Optional)</label>
                                 <textarea
                                     rows="3"
-                                    placeholder="e.g. 3 years experience building SaaS applications with Express and React..."
+                                    placeholder="e.g. 3 years experience building full-stack applications with Express and React. Led team migration to TypeScript..."
                                     value={selfDescription}
                                     onChange={(e) => setSelfDescription(e.target.value)}
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label>Upload Resume PDF (Optional)</label>
+                                <label>Resume Document (Optional)</label>
                                 <div className="file-upload-box">
                                     <label htmlFor="resume-file" className="upload-label">
-                                        <span className="icon">📄</span>
+                                        <div className="upload-icon-box">
+                                            <FileUpIcon size={22} className="upload-svg" />
+                                        </div>
                                         <span className="main-text">
-                                            {resumeFile ? resumeFile.name : "Click to select or drag Resume PDF"}
+                                            {resumeFile ? resumeFile.name : "Select or drag Resume PDF"}
                                         </span>
                                         <span className="sub-text">PDF format, up to 5MB</span>
                                         {resumeFile && (
-                                            <span className="selected-filename">✓ File Attached</span>
+                                            <span className="selected-filename">
+                                                <CheckCircleIcon size={14} className="check-svg" /> File Attached
+                                            </span>
                                         )}
                                     </label>
                                     <input
@@ -193,7 +266,7 @@ const Interview = () => {
                             </div>
 
                             <button type="submit" className="button primary-button start-btn">
-                                Generate Interview Questions
+                                Generate Practice Questions
                             </button>
                         </form>
                     </div>
@@ -225,7 +298,7 @@ const Interview = () => {
                             <div className="question-text">{currentQuestion.question}</div>
                             {currentQuestion.intent && (
                                 <div className="intent-box">
-                                    <div className="intent-label">Interviewer Focus & Intent</div>
+                                    <div className="intent-label">Assessment Focus</div>
                                     <div className="intent-text">{currentQuestion.intent}</div>
                                 </div>
                             )}
@@ -234,21 +307,21 @@ const Interview = () => {
                         {/* Answer Input Area */}
                         <div className="answer-card">
                             <div className="answer-header">
-                                <label>Your Answer</label>
+                                <label>Your Response</label>
                                 <span className="word-count">
                                     {currentAnswer.trim() ? currentAnswer.trim().split(/\s+/).length : 0} words
                                 </span>
                             </div>
 
                             <textarea
-                                placeholder="Structure your response clearly. Cover key concepts, trade-offs, and examples..."
+                                placeholder="Structure your response with clear trade-offs, technical principles, and concrete examples..."
                                 value={currentAnswer}
                                 onChange={(e) => saveAnswer(e.target.value, currentQuestionIndex)}
                             />
 
                             {showSampleAnswer && currentQuestion.sampleAnswer && (
                                 <div className="sample-answer-preview">
-                                    <div className="preview-title">Suggested Talking Points & Model Response:</div>
+                                    <div className="preview-title">Suggested Talking Points & Model Approach:</div>
                                     <p>{currentQuestion.sampleAnswer}</p>
                                 </div>
                             )}
@@ -259,7 +332,8 @@ const Interview = () => {
                                     className="toggle-answer-btn"
                                     onClick={() => setShowSampleAnswer(!showSampleAnswer)}
                                 >
-                                    {showSampleAnswer ? "Hide Sample Guidance" : "Show Guidance & Tips"}
+                                    <HelpCircleIcon size={14} className="guidance-icon" />
+                                    {showSampleAnswer ? "Hide Suggested Approach" : "Show Suggested Approach"}
                                 </button>
 
                                 <div className="nav-buttons">
@@ -269,16 +343,18 @@ const Interview = () => {
                                         onClick={handlePrevQuestion}
                                         disabled={currentQuestionIndex === 0}
                                     >
-                                        Previous
+                                        <ArrowLeftIcon size={14} className="inline-arrow" /> Previous
                                     </button>
                                     <button
                                         type="button"
                                         className="button primary-button next-btn"
                                         onClick={handleSaveAndNext}
                                     >
-                                        {currentQuestionIndex === totalQuestions - 1
-                                            ? "Complete & Evaluate"
-                                            : "Next Question"}
+                                        {currentQuestionIndex === totalQuestions - 1 ? (
+                                            <>Complete & Evaluate</>
+                                        ) : (
+                                            <>Next Question <ArrowRightIcon size={14} className="inline-arrow" /></>
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -289,10 +365,12 @@ const Interview = () => {
                 {/* 5. Interview Completion State */}
                 {!loading && !evaluating && isCompleted && (
                     <div className="completion-card">
-                        <div className="completion-icon">🎉</div>
-                        <h2>Interview Session Completed!</h2>
+                        <div className="completion-icon-box">
+                            <CheckCircleIcon size={40} className="completion-check" />
+                        </div>
+                        <h2>Assessment Completed</h2>
                         <p>
-                            You have completed all questions in this assessment. Your responses and performance analysis are saved.
+                            All questions have been answered and evaluated. Your performance report and customized 7-day preparation roadmap are ready.
                         </p>
 
                         <div className="summary-stats">
@@ -310,7 +388,7 @@ const Interview = () => {
                                         ? `${currentInterview.overallScore}%`
                                         : (currentInterview?.matchScore !== undefined ? `${currentInterview.matchScore}%` : "85%")}
                                 </div>
-                                <div className="stat-label">Evaluation Score</div>
+                                <div className="stat-label">Performance Score</div>
                             </div>
                         </div>
 
@@ -320,21 +398,21 @@ const Interview = () => {
                                     className="button primary-button"
                                     onClick={() => navigate(`/reports/${interviewId}`)}
                                 >
-                                    View Detailed Report
+                                    View Assessment Report <ArrowRightIcon size={14} className="inline-arrow" />
                                 </button>
                             ) : (
                                 <button
                                     className="button primary-button"
                                     onClick={() => navigate("/reports")}
                                 >
-                                    View All Reports
+                                    View All Reports <ArrowRightIcon size={14} className="inline-arrow" />
                                 </button>
                             )}
                             <button
                                 className="button secondary-button"
                                 onClick={resetInterviewSession}
                             >
-                                Start Another Interview
+                                Start New Session
                             </button>
                         </div>
                     </div>

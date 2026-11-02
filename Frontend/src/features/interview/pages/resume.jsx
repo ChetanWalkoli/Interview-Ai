@@ -3,6 +3,85 @@ import { Link, useNavigate } from "react-router";
 import { downloadResumePdf } from "../services/interview.api";
 import "../styles/resume.scss";
 
+// Reusable zero-dependency stroke-based Lucide-inspired SVG icon components
+const IconWrapper = ({ children, size = 18, className = "" }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        aria-hidden="true"
+        focusable="false"
+    >
+        {children}
+    </svg>
+);
+
+const ArrowLeftIcon = ({ size = 15, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="m12 19-7-7 7-7" />
+        <path d="M19 12H5" />
+    </IconWrapper>
+);
+
+const ArrowRightIcon = ({ size = 14, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+    </IconWrapper>
+);
+
+const DownloadIcon = ({ size = 16, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" x2="12" y1="15" y2="3" />
+    </IconWrapper>
+);
+
+const SparklesIcon = ({ size = 14, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+    </IconWrapper>
+);
+
+const PlusIcon = ({ size = 14, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <line x1="12" x2="12" y1="5" y2="19" />
+        <line x1="5" x2="19" y1="12" y2="12" />
+    </IconWrapper>
+);
+
+const Trash2Icon = ({ size = 13, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="M3 6h18" />
+        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+        <line x1="10" x2="10" y1="11" y2="17" />
+        <line x1="14" x2="14" y1="11" y2="17" />
+    </IconWrapper>
+);
+
+const CheckCircleIcon = ({ size = 18, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+        <path d="m9 11 3 3L22 4" />
+    </IconWrapper>
+);
+
+const AlertCircleIcon = ({ size = 18, className = "" }) => (
+    <IconWrapper size={size} className={className}>
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" x2="12" y1="8" y2="12" />
+        <line x1="12" x2="12.01" y1="16" y2="16" />
+    </IconWrapper>
+);
+
 const Resume = () => {
     const navigate = useNavigate();
 
@@ -70,14 +149,15 @@ const Resume = () => {
         ]);
         setProjects([
             {
-                name: "AI Interview Coach",
+                name: "interview-ai",
                 technologies: "React, Node.js, Express, Gemini AI",
                 link: "https://interview-ai.app",
-                description: "Full-stack AI assessment tool generating real-time technical questions and personalized evaluation roadmaps."
+                description: "Full-stack assessment platform generating real-time technical questions and personalized evaluation roadmaps."
             }
         ]);
         setCertifications("AWS Certified Solutions Architect, MongoDB Certified Developer");
         setErrorMsg(null);
+        setSuccessMsg(null);
     };
 
     // Experience item helpers
@@ -168,9 +248,9 @@ const Resume = () => {
 
         try {
             await downloadResumePdf(payload);
-            setSuccessMsg("Resume PDF generated and downloaded successfully!");
+            setSuccessMsg("Resume PDF exported and downloaded successfully.");
         } catch (err) {
-            setErrorMsg(err.message || "Failed to generate resume PDF. Please check server connection.");
+            setErrorMsg(err.message || "Failed to generate resume PDF. Please verify backend connection.");
         } finally {
             setGenerating(false);
         }
@@ -180,15 +260,16 @@ const Resume = () => {
         <div className="resume-page">
             <header className="resume-header">
                 <Link to="/" className="brand-link">
-                    <span className="badge">AI</span>
-                    <span className="title">Professional Resume Builder</span>
+                    <span className="title">interview-ai</span>
+                    <span className="session-divider">/</span>
+                    <span className="session-sub">Resume Builder</span>
                 </Link>
                 <div className="header-actions">
                     <button className="home-btn" onClick={() => navigate("/")}>
-                        ← Back to Home
+                        <ArrowLeftIcon size={14} className="nav-icon" /> Home
                     </button>
                     <button className="button primary-button" onClick={() => navigate("/interview")}>
-                        Start Interview
+                        Start Session <ArrowRightIcon size={13} className="inline-arrow" />
                     </button>
                 </div>
             </header>
@@ -196,31 +277,37 @@ const Resume = () => {
             <main className="resume-container">
                 <div className="page-intro">
                     <div>
-                        <h1>Generate ATS-Optimized Resume PDF</h1>
-                        <p>Fill out your credentials below to generate a cleanly formatted, selectable A4 resume PDF.</p>
+                        <h1>Standardized Resume Builder</h1>
+                        <p>Build and export a clean, ATS-compliant resume PDF from your professional credentials.</p>
                     </div>
                     <button type="button" className="prefill-btn" onClick={handlePrefillSample}>
-                        ⚡ Prefill Sample Data
+                        <SparklesIcon size={14} className="sparkle-icon" /> Load Demo Data
                     </button>
                 </div>
 
                 {/* Notifications */}
                 {errorMsg && (
                     <div className="notification-card error">
-                        <strong>Error:</strong> {errorMsg}
+                        <AlertCircleIcon size={18} className="notif-icon" />
+                        <div>
+                            <strong>Notice:</strong> {errorMsg}
+                        </div>
                     </div>
                 )}
 
                 {successMsg && (
                     <div className="notification-card success">
-                        <strong>Success:</strong> {successMsg}
+                        <CheckCircleIcon size={18} className="notif-icon" />
+                        <div>
+                            <strong>Success:</strong> {successMsg}
+                        </div>
                     </div>
                 )}
 
                 <form className="resume-form" onSubmit={handleGeneratePdf}>
                     {/* 1. Contact Information */}
                     <div className="form-section">
-                        <div className="section-header">1. Contact & Personal Details</div>
+                        <div className="section-header">1. Contact & Identity</div>
                         <div className="grid-2">
                             <div className="form-group">
                                 <label>Full Name <span className="req">*</span></label>
@@ -276,7 +363,7 @@ const Resume = () => {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>LinkedIn / GitHub</label>
+                                <label>LinkedIn / GitHub URL</label>
                                 <input
                                     type="text"
                                     placeholder="e.g. linkedin.com/in/alexjohnson"
@@ -289,12 +376,12 @@ const Resume = () => {
 
                     {/* 2. Professional Summary */}
                     <div className="form-section">
-                        <div className="section-header">2. Professional Summary</div>
+                        <div className="section-header">2. Executive Summary</div>
                         <div className="form-group">
-                            <label>Summary Statement</label>
+                            <label>Professional Summary Statement</label>
                             <textarea
                                 rows="3"
-                                placeholder="Highlight your core experience, key accomplishments, and main domain focus..."
+                                placeholder="Highlight primary technical strengths, domain expertise, and quantifiable track record..."
                                 value={summary}
                                 onChange={(e) => setSummary(e.target.value)}
                             />
@@ -303,12 +390,12 @@ const Resume = () => {
 
                     {/* 3. Technical Skills */}
                     <div className="form-section">
-                        <div className="section-header">3. Technical Skills</div>
+                        <div className="section-header">3. Technical Competencies</div>
                         <div className="form-group">
-                            <label>Skills & Technologies (comma separated)</label>
+                            <label>Core Skills & Technologies (comma-separated)</label>
                             <input
                                 type="text"
-                                placeholder="e.g. React, Node.js, TypeScript, PostgreSQL, Docker, AWS"
+                                placeholder="e.g. React, Node.js, TypeScript, PostgreSQL, Docker, AWS, System Design"
                                 value={skills}
                                 onChange={(e) => setSkills(e.target.value)}
                             />
@@ -317,27 +404,27 @@ const Resume = () => {
 
                     {/* 4. Work Experience */}
                     <div className="form-section">
-                        <div className="section-header">4. Work Experience</div>
+                        <div className="section-header">4. Professional Experience</div>
                         {experience.map((exp, idx) => (
                             <div key={idx} className="item-card">
                                 <div className="item-header">
-                                    <span>Position #{idx + 1}</span>
+                                    <span className="item-index">Position #{idx + 1}</span>
                                     {experience.length > 1 && (
                                         <button
                                             type="button"
                                             className="remove-btn"
                                             onClick={() => removeExperience(idx)}
                                         >
-                                            ✕ Remove
+                                            <Trash2Icon size={12} className="remove-icon" /> Remove
                                         </button>
                                     )}
                                 </div>
                                 <div className="grid-2">
                                     <div className="form-group">
-                                        <label>Job Title</label>
+                                        <label>Role Title</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. Software Engineer"
+                                            placeholder="e.g. Senior Full-Stack Engineer"
                                             value={exp.title}
                                             onChange={(e) => handleExperienceChange(idx, "title", e.target.value)}
                                         />
@@ -346,26 +433,26 @@ const Resume = () => {
                                         <label>Company / Organization</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. TechCorp"
+                                            placeholder="e.g. CloudScale Technologies"
                                             value={exp.company}
                                             onChange={(e) => handleExperienceChange(idx, "company", e.target.value)}
                                         />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label>Duration / Period</label>
+                                    <label>Employment Period</label>
                                     <input
                                         type="text"
-                                        placeholder="e.g. 2021 - Present"
+                                        placeholder="e.g. 2022 - Present"
                                         value={exp.period}
                                         onChange={(e) => handleExperienceChange(idx, "period", e.target.value)}
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Responsibilities & Impact</label>
+                                    <label>Responsibilities & Technical Impact</label>
                                     <textarea
                                         rows="2"
-                                        placeholder="Key accomplishments, technologies utilized, and quantifiable results..."
+                                        placeholder="Key architectural contributions, metrics, and technologies utilized..."
                                         value={exp.description}
                                         onChange={(e) => handleExperienceChange(idx, "description", e.target.value)}
                                     />
@@ -373,7 +460,7 @@ const Resume = () => {
                             </div>
                         ))}
                         <button type="button" className="add-item-btn" onClick={addExperience}>
-                            + Add Another Position
+                            <PlusIcon size={14} className="plus-icon" /> Add Position
                         </button>
                     </div>
 
@@ -383,14 +470,14 @@ const Resume = () => {
                         {projects.map((proj, idx) => (
                             <div key={idx} className="item-card">
                                 <div className="item-header">
-                                    <span>Project #{idx + 1}</span>
+                                    <span className="item-index">Project #{idx + 1}</span>
                                     {projects.length > 1 && (
                                         <button
                                             type="button"
                                             className="remove-btn"
                                             onClick={() => removeProject(idx)}
                                         >
-                                            ✕ Remove
+                                            <Trash2Icon size={12} className="remove-icon" /> Remove
                                         </button>
                                     )}
                                 </div>
@@ -399,7 +486,7 @@ const Resume = () => {
                                         <label>Project Name</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. Microservices Platform"
+                                            placeholder="e.g. Distributed Cache Proxy"
                                             value={proj.name}
                                             onChange={(e) => handleProjectChange(idx, "name", e.target.value)}
                                         />
@@ -408,17 +495,26 @@ const Resume = () => {
                                         <label>Technologies Used</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. React, Express, Redis"
+                                            placeholder="e.g. Go, Redis, Docker, gRPC"
                                             value={proj.technologies}
                                             onChange={(e) => handleProjectChange(idx, "technologies", e.target.value)}
                                         />
                                     </div>
                                 </div>
                                 <div className="form-group">
-                                    <label>Description</label>
+                                    <label>Project Link / Repository (Optional)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. github.com/username/project"
+                                        value={proj.link}
+                                        onChange={(e) => handleProjectChange(idx, "link", e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Architectural Design & Impact</label>
                                     <textarea
                                         rows="2"
-                                        placeholder="Problem solved, architectural design, and impact..."
+                                        placeholder="Problem addressed, architectural decisions, and performance outcomes..."
                                         value={proj.description}
                                         onChange={(e) => handleProjectChange(idx, "description", e.target.value)}
                                     />
@@ -426,24 +522,24 @@ const Resume = () => {
                             </div>
                         ))}
                         <button type="button" className="add-item-btn" onClick={addProject}>
-                            + Add Another Project
+                            <PlusIcon size={14} className="plus-icon" /> Add Project
                         </button>
                     </div>
 
                     {/* 6. Education */}
                     <div className="form-section">
-                        <div className="section-header">6. Education</div>
+                        <div className="section-header">6. Education & Academic Background</div>
                         {education.map((edu, idx) => (
                             <div key={idx} className="item-card">
                                 <div className="item-header">
-                                    <span>Degree #{idx + 1}</span>
+                                    <span className="item-index">Degree #{idx + 1}</span>
                                     {education.length > 1 && (
                                         <button
                                             type="button"
                                             className="remove-btn"
                                             onClick={() => removeEducation(idx)}
                                         >
-                                            ✕ Remove
+                                            <Trash2Icon size={12} className="remove-icon" /> Remove
                                         </button>
                                     )}
                                 </div>
@@ -458,10 +554,10 @@ const Resume = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>Institution / University</label>
+                                        <label>University / Institution</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. Stanford University"
+                                            placeholder="e.g. University of California, Berkeley"
                                             value={edu.institution}
                                             onChange={(e) => handleEducationChange(idx, "institution", e.target.value)}
                                         />
@@ -478,10 +574,10 @@ const Resume = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label>GPA (Optional)</label>
+                                        <label>GPA / Honors (Optional)</label>
                                         <input
                                             type="text"
-                                            placeholder="e.g. 3.9 / 4.0"
+                                            placeholder="e.g. 3.8 / 4.0"
                                             value={edu.gpa}
                                             onChange={(e) => handleEducationChange(idx, "gpa", e.target.value)}
                                         />
@@ -490,18 +586,18 @@ const Resume = () => {
                             </div>
                         ))}
                         <button type="button" className="add-item-btn" onClick={addEducation}>
-                            + Add Education
+                            <PlusIcon size={14} className="plus-icon" /> Add Education
                         </button>
                     </div>
 
                     {/* 7. Certifications */}
                     <div className="form-section">
-                        <div className="section-header">7. Certifications & Achievements</div>
+                        <div className="section-header">7. Certifications & Credentials</div>
                         <div className="form-group">
-                            <label>Certificates / Honors (comma separated)</label>
+                            <label>Certificates & Licenses (comma-separated)</label>
                             <input
                                 type="text"
-                                placeholder="e.g. AWS Certified Developer, Certified Kubernetes Administrator"
+                                placeholder="e.g. AWS Certified Solutions Architect, Certified Kubernetes Administrator"
                                 value={certifications}
                                 onChange={(e) => setCertifications(e.target.value)}
                             />
@@ -515,10 +611,16 @@ const Resume = () => {
                             className="button primary-button download-btn"
                             disabled={generating}
                         >
-                            {generating ? "Generating Professional PDF..." : "📄 Download Resume PDF"}
+                            {generating ? (
+                                "Exporting PDF Document..."
+                            ) : (
+                                <>
+                                    <DownloadIcon size={16} className="download-icon" /> Export Resume PDF
+                                </>
+                            )}
                         </button>
                         <span className="hint-text">
-                            Generates a standard A4 PDF formatted with clean selectable typography.
+                            Generates a standardized A4 PDF with clean selectable typography and ATS-optimized structure.
                         </span>
                     </div>
                 </form>
@@ -528,4 +630,3 @@ const Resume = () => {
 };
 
 export default Resume;
-

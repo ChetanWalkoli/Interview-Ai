@@ -155,17 +155,46 @@ const interviewEvaluationSchema = {
     required: ["overallScore", "questionEvaluations", "strengths", "areasForImprovement", "recommendations"]
 };
 
+/**
+ * Retries transient network / rate-limiting errors automatically
+ */
+async function callGeminiWithRetry(fn, maxRetries = 2, delayMs = 1500) {
+    for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+        try {
+            return await fn();
+        } catch (err) {
+            const errMsg = err?.message || "";
+            const errCode = err?.cause?.code || "";
+            const isTransient = errMsg.includes("fetch failed") ||
+                                errCode === "ECONNRESET" ||
+                                errCode === "ETIMEDOUT" ||
+                                errCode === "ENOTFOUND" ||
+                                err?.status === 503 ||
+                                err?.status === 429;
+
+            if (attempt <= maxRetries && isTransient) {
+                console.warn(`[Gemini AI] Temporary connection issue (${errMsg}). Retrying in ${delayMs * attempt}ms (attempt ${attempt}/${maxRetries})...`);
+                await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
+            } else {
+                throw err;
+            }
+        }
+    }
+}
+
 async function invokeGeminiAi(prompt = "Say hello") {
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-3.6-flash",
-            contents: prompt,
-            config: { responseMimeType: "text/plain" }
-        });
+        const response = await callGeminiWithRetry(() =>
+            ai.models.generateContent({
+                model: "gemini-3.6-flash",
+                contents: prompt,
+                config: { responseMimeType: "text/plain" }
+            })
+        );
         console.log("Gemini response:", response.text);
         return response.text;
     } catch (err) {
-        console.error("Error invoking Gemini:", err.message);
+        console.error("Error invoking Gemini:", err?.cause?.message || err.message);
         return null;
     }
 }
@@ -194,19 +223,21 @@ Produce detailed technical questions, behavioral questions, skill gap analysis, 
 `;
 
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-3.6-flash",
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                responseJsonSchema: interviewReportSchema
-            }
-        });
+        const response = await callGeminiWithRetry(() =>
+            ai.models.generateContent({
+                model: "gemini-3.6-flash",
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseJsonSchema: interviewReportSchema
+                }
+            })
+        );
 
         const data = JSON.parse(response.text);
         return data;
     } catch (err) {
-        console.error("Error generating interview report:", err.message);
+        console.error("Error generating interview report:", err?.cause?.message || err.message);
         throw err;
     }
 }
@@ -235,18 +266,20 @@ Provide a fair, rigorous evaluation:
 `;
 
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-3.6-flash",
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                responseJsonSchema: interviewEvaluationSchema
-            }
-        });
+        const response = await callGeminiWithRetry(() =>
+            ai.models.generateContent({
+                model: "gemini-3.6-flash",
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseJsonSchema: interviewEvaluationSchema
+                }
+            })
+        );
 
         return JSON.parse(response.text);
     } catch (err) {
-        console.error("Error evaluating answers with Gemini:", err.message);
+        console.error("Error evaluating answers with Gemini:", err?.cause?.message || err.message);
         // Fallback calculation in case of AI rate limit
         const answeredCount = Object.values(answers).filter(a => typeof a === "string" && a.trim().length > 0).length;
         const total = questions.length || 1;
