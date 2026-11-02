@@ -5,7 +5,7 @@ const {
     evaluateInterviewReportController,
     getInterviewReportByIdController,
     getAllInterviewReportsController
-} = require("../Controllers/interview.Controller");
+} = require("../controllers/interview.Controller");
 const upload = require("../middlewares/file.middleware");
 
 const interviewRouter = express.Router();

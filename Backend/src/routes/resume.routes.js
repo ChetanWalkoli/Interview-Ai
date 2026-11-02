@@ -1,6 +1,6 @@
 const express = require('express');
 const { authUser } = require("../middlewares/auth.middleware");
-const { generateResumePdfController } = require("../Controllers/resume.Controller");
+const { generateResumePdfController } = require("../controllers/resume.Controller");
 
 const resumeRouter = express.Router();
 

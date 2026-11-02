@@ -6,9 +6,6 @@ const app = express();
 
 app.set("trust proxy", 1);
 
-app.use(express.json());
-app.use(cookieParser());
-
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
@@ -29,6 +26,9 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
+
+app.use(express.json());
+app.use(cookieParser());
 
 // Require routes
 const authRouter = require("./routes/auth.routes");
