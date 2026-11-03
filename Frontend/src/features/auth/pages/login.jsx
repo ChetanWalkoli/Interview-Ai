@@ -64,6 +64,7 @@ const Login = () => {
                             id="password"
                             name="password"
                             placeholder="Enter your password"
+                            autoComplete="current-password"
                             required
                         />
                     </div>
